@@ -59,9 +59,27 @@ sublist(nil, nil).
 sublist(nil, cons(_, _)).
 sublist(cons(H, T), N) :- search(H, N), sublist(T, N).
 %NUOVA VERSIONE
-find([E |_], E).
-find([_ |T], E) :- find(T ,E).
+%VERSIONE 1: USO FIND
+%find([E |_], E).
+%find([_ |T], E) :- find(T ,E).
 %uso la funzione find
+%new_sublist([], []).
+%new_sublist([], [_ | _]).
+%new_sublist([H | T], [Hn | Tn]) :- find([Hn | Tn], H), new_sublist(T, [Hn | Tn]).
+%VERSIONE 2: USO BUILTIN MEMBER!!!
 new_sublist([], []).
 new_sublist([], [_ | _]).
-new_sublist([H | T], [Hn | Tn]) :- find([Hn | Tn], H), sublist(T, [Hn | Tn]).
+%ho messo M al posto di [Hn | Tn] dato che si sa già che M è una lista e non sto facendo confronti tra teste e code di liste (mi basta solo sapere che H sia dentro lista M
+new_sublist([H | T], M) :- member(H, M),  new_sublist(T, M).
+%esercizio 7: dropAny
+dropAny(X, [X | T], T).
+dropAny(X, [H | Xs], [H | L]) :- dropAny(X, Xs, L).
+%esercizio 8: dropFirst
+%uso il precedente dropAny creato e dopo che questo si è risolto, uso il cut per evitare che vengano compiuti i casi successivi
+%così facendo, tutti gli altri possibili drop esistenti vengono "tagliati via" dalla soluzione (pruned)
+dropFirst(X, L, M) :- dropAny(X, L, M), !.
+%esercizio 9: dropLast
+dropLast(X, [H | Xs], [H | L]) :- !, dropAny(X, Xs, L).
+%esercizio 10: dropAll
+dropAll(X, [X | T], T) :- dropAll(X, T, T).
+dropAll(X, [H | Xs], [H | L]) :- dropAll(X, Xs, L).
