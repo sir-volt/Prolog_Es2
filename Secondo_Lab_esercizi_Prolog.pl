@@ -79,7 +79,30 @@ dropAny(X, [H | Xs], [H | L]) :- dropAny(X, Xs, L).
 %così facendo, tutti gli altri possibili drop esistenti vengono "tagliati via" dalla soluzione (pruned)
 dropFirst(X, L, M) :- dropAny(X, L, M), !.
 %esercizio 9: dropLast
-dropLast(X, [H | Xs], [H | L]) :- !, dropAny(X, Xs, L).
+dropLast(X, [H], [H]) :- !.
+dropLast(X, [X | T], L) :- dropLast(X, T, L).
+dropLast(X, [H | Xs], [H | L]) :- !, dropLast(X, Xs, L).
 %esercizio 10: dropAll
-dropAll(X, [X | T], T) :- dropAll(X, T, T).
+%quando sono nel caso in cui ho ancora una lista con elementi , ma sono arrivato a quello che desidero togliere, prima passo alla drop successiva, e in seguito con il cut tolgo altre strade successive
+dropAll(X, [H], [H]).
+dropAll(X, [X | T], L) :- dropAll(X, T, L), !.
 dropAll(X, [H | Xs], [H | L]) :- dropAll(X, Xs, L).
+%esercizio 11: fromList
+%crea un grafico da una lista
+fromList([_], []) .
+fromList([H1, H2 | T], [e(H1, H2) | L]) :- fromList([H2 | T], L).
+%esercizio 12: fromCircleList
+%creo il caso base in cui ho solo una lista con un singolo elemento H, che restituisce un lista con un solo elemento e(H, H)
+fromCircleList([H], [e(H, H)]).
+%da qui creo una versione con un supporter, che tiene sempre in mente il primissimo elemento della lista appena chiamo questa funzione
+fromCircleList([H1, H2 | T], [e(H1, H2) | L]) :- fromCircleList([H2 | T], H1, L).
+%qui sotto abbiamo casi: il primo che ho scritto è quando siamo arrivati in fondo alla lista di N elementi, quindi aggiungiamo un ultimo e[H, Primissimo Elemento della lista]
+%il secondo caso è quando sto ancora scorrendo la lista, perciò inserisco nella lista da restituire la coppia e[H1, H2], per poi passare all'elemento successivo
+fromCircleList([H], H3, [e(H, H3)]).
+fromCircleList([H1, H2 | T], H3, [e(H1, H2) | L]) :- fromCircleList([H2 | T], H3, L).
+%esercizio 13: outDegree
+outDegree([], N, 0).
+outDegree([e(H1, H2) | T], H1, N) :- outDegree(T, H1, N2), N is N2 + 1.
+outDegree([e(H1, H2) | T], H3, N) :- outDegree(T, H3, N2), N is N2.
+%esercizio 14: dropNode
+dropNode(G, N, OG) :- dropAll(e(N, _), G, G2), dropAll(e(_, N), G2, OG).
