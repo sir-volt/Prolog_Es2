@@ -79,9 +79,9 @@ dropAny(X, [H | Xs], [H | L]) :- dropAny(X, Xs, L).
 %così facendo, tutti gli altri possibili drop esistenti vengono "tagliati via" dalla soluzione (pruned)
 dropFirst(X, L, M) :- dropAny(X, L, M), !.
 %esercizio 9: dropLast
-dropLast(X, [H], [H]) :- !.
-dropLast(X, [X | T], L) :- dropLast(X, T, L).
-dropLast(X, [H | Xs], [H | L]) :- !, dropLast(X, Xs, L).
+%l'ordine invertito funziona, ma non comprendo per bene perchè sia necessario (ho continuato a fare prove su prove, il risultato ottenuto è stato fatto tramite brute force)
+dropLast(X, [H | Xs], [H | L]) :- dropLast(X, Xs, L), !.
+dropLast(X, [X | T], T).
 %esercizio 10: dropAll
 %quando sono nel caso in cui ho ancora una lista con elementi , ma sono arrivato a quello che desidero togliere, prima passo alla drop successiva, e in seguito con il cut tolgo altre strade successive
 dropAll(X, [H], [H]).
@@ -101,8 +101,25 @@ fromCircleList([H1, H2 | T], [e(H1, H2) | L]) :- fromCircleList([H2 | T], H1, L)
 fromCircleList([H], H3, [e(H, H3)]).
 fromCircleList([H1, H2 | T], H3, [e(H1, H2) | L]) :- fromCircleList([H2 | T], H3, L).
 %esercizio 13: outDegree
+%il caso base verifica quando sono arrivato alla fine della lista, in tal caso il numero di "edges" che portano al nodo N è pari a 0
 outDegree([], N, 0).
+%nei due casi successivi, verifico che a partire dal nodo che sto andando a cercare, l'elemento in testa sia o meno uno degli edges (lo verifico se il valore H che controllo e il primo valore
+%di e(H, H2) siano uguali, in tal caso scorro la riga e dirò che il numero da restituire N corrisponderà al numero ottenuto dal lavoro fatto sul resto della lista aumentato di 1
 outDegree([e(H1, H2) | T], H1, N) :- outDegree(T, H1, N2), N is N2 + 1.
 outDegree([e(H1, H2) | T], H3, N) :- outDegree(T, H3, N2), N is N2.
 %esercizio 14: dropNode
 dropNode(G, N, OG) :- dropAll(e(N, _), G, G2), dropAll(e(_, N), G2, OG).
+%esercizio 15: reaching
+%a partire da un nodo, devo vedere quanti diversi altri nodi posso raggiungere con un solo passo
+reaching([], N, []).
+reaching([e(N, H) | T], N, [H | L]) :- reaching(T, N, L), !.
+reaching([e(H1, H2) | T], N, L) :- reaching(T, N, L), !.
+%esercizio 16: nodes, l'inverso di fromList
+%fromList([_], []) .
+%fromList([H1, H2 | T], [e(H1, H2) | L]) :- fromList([H2 | T], L).
+nodes([], []).
+nodes([e(H1, H2) | T], [H2 | L]) :- member(H1, L), nodes(T, L), !.
+%nodes([e(H1, H2) | T], [H1 | L]) :- member(H2, L), nodes(T, L), !.
+%nodes([e(H1, H2) | T], [H2 | L]) :- member(H1, L), nodes(T, L), !.
+%esercizio 17: anyPath
+%trova tutti i possibili path che vanno da un nodo H1 fino ad un nodo H2
